@@ -1,0 +1,9 @@
+-rootPath
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/SerialPrograms
+-cmake-output
+-output-file
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/.qt/qml_imports/SerialPrograms_conf.cmake
+-importPath
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo
+-importPath
+C:/Qt/6.8.3/msvc2022_64/qml

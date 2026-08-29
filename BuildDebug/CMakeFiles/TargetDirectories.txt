@@ -1,0 +1,16 @@
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/build-time-make-directory.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialProgramsLib.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialPrograms.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/clone_packages.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/run_windeployqt.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/DeployRuntime.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialPrograms_qmlimportscan.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialProgramsCommandLine.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/edit_cache.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/rebuild_cache.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialProgramsLib_autogen_timestamp_deps.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialProgramsLib_autogen.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialPrograms_autogen_timestamp_deps.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialPrograms_autogen.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialProgramsCommandLine_autogen_timestamp_deps.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildDebug/CMakeFiles/SerialProgramsCommandLine_autogen.dir

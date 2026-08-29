@@ -1,0 +1,16 @@
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/build-time-make-directory.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialProgramsLib.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialPrograms.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/clone_packages.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/run_windeployqt.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/DeployRuntime.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialPrograms_qmlimportscan.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialProgramsCommandLine.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/edit_cache.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/rebuild_cache.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialProgramsLib_autogen_timestamp_deps.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialProgramsLib_autogen.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialPrograms_autogen_timestamp_deps.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialPrograms_autogen.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialProgramsCommandLine_autogen_timestamp_deps.dir
+C:/Users/tonyl/Desktop/pokmon/automation/PokeAutomationSauce/Arduino-Source/BuildRelWithDebInfo/CMakeFiles/SerialProgramsCommandLine_autogen.dir
