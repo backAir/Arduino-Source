@@ -10,7 +10,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Logging/AbstractLogger.h"
 #include "CommonFramework/GlobalAutoPaths.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/OperationFailedExceptionWithScreenshot.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -227,11 +227,7 @@ BlinkRecovery recover_state_from_blinks(
                 + std::to_string(config.liveness_timeout.count() / 60) + " minutes";
             return ret;
         }
-        try{
-            subcontext.wait_until(current_time() + config.poll_interval);
-        }catch (OperationCancelledException&){}
-        subcontext.throw_if_cancelled_with_exception();
-        context.throw_if_cancelled();
+        subcontext.wait_until(current_time() + config.poll_interval);
 
         keep_awake_if_due(context, next_nudge, config.keep_awake_interval);
 
@@ -509,13 +505,9 @@ void hold_and_reanchor(
         // the press is timed off this anchor, so this is the most valuable check
         bool leaving = current_time() >= leave_at;
         if (!leaving){
-            try{
-                subcontext.wait_until(std::min({
-                    leave_at, next_reanchor, current_time() + config.poll_interval
-                }));
-            }catch (OperationCancelledException&){}
-            subcontext.throw_if_cancelled_with_exception();
-            context.throw_if_cancelled();
+            subcontext.wait_until(std::min({
+                leave_at, next_reanchor, current_time() + config.poll_interval
+            }));
             keep_awake_if_due(context, next_nudge, config.keep_awake_interval);
         }
 
@@ -546,7 +538,7 @@ void hold_and_reanchor(
         }else{
             consecutive_failures++;
             if (consecutive_failures >= config.max_reanchor_failures){
-                OperationFailedException::fire(
+                OperationFailedExceptionWithScreenshot::fire(
                     ErrorReport::NO_ERROR_REPORT,
                     std::to_string(consecutive_failures)
                     + " consecutive re-anchor failures: the blinks can no longer be read, "
