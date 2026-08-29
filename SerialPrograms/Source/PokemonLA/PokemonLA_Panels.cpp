@@ -12,6 +12,8 @@
 #include "PokemonLA_Settings.h"
 
 #include "Programs/General/PokemonLA_BraviaryHeightGlitch.h"
+#include "Programs/General/PokemonLA_RngAdvances.h"
+
 #include "Programs/General/PokemonLA_DistortionWaiter.h"
 #include "Programs/General/PokemonLA_OutbreakFinder.h"
 #include "Programs/General/PokemonLA_ClothingBuyer.h"
@@ -69,6 +71,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>());
+    ret.emplace_back(make_single_switch_program<RngAdvances_Descriptor, RngAdvances>());
     ret.emplace_back(make_single_switch_program<DistortionWaiter_Descriptor, DistortionWaiter>());
     ret.emplace_back(make_single_switch_program<OutbreakFinder_Descriptor, OutbreakFinder>());
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());

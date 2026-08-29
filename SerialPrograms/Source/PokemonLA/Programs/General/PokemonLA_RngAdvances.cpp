@@ -7,7 +7,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonLA_BraviaryHeightGlitch.h"
+#include "PokemonLA_RngAdvances.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -15,11 +15,11 @@ namespace PokemonLA{
     using namespace Pokemon;
 
 
-BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
+RngAdvances_Descriptor::RngAdvances_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonLA:BraviaryHeightGlitch",
-        STRING_POKEMON + " LA", "Braviary Height Glitch brrr",
-        "Programs/PokemonLA/BraviaryHeightGlitch.html",
+        "PokemonLA:RngAdvances",
+        STRING_POKEMON + " LA", "Rng Advances",
+        "Programs/PokemonLA/RngAdvances.html",
         "Increase your height in place using the height glitch.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
@@ -28,10 +28,10 @@ BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
 {}
 
 
-BraviaryHeightGlitch::BraviaryHeightGlitch(){}
+RngAdvances::RngAdvances(){}
 
 
-void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void RngAdvances::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
     require_player(env.console, context, BUTTON_LCLICK);
 

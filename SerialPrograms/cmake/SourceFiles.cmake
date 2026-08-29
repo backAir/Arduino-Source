@@ -1864,6 +1864,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLA/Programs/General/PokemonLA_ApplyGrits.h
     Source/PokemonLA/Programs/General/PokemonLA_BraviaryHeightGlitch.cpp
     Source/PokemonLA/Programs/General/PokemonLA_BraviaryHeightGlitch.h
+    Source/PokemonLA/Programs/General/PokemonLA_RngAdvances.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_RngAdvances.h
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h
     Source/PokemonLA/Programs/General/PokemonLA_DistortionWaiter.cpp
