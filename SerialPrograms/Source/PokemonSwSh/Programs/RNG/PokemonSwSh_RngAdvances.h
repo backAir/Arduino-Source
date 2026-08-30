@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_RngAdvances_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -32,6 +33,8 @@ public:
 
 private:
     SimpleIntegerOption<uint32_t> SKIPS;
+
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

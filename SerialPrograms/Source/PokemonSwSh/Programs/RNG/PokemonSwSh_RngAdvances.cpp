@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -52,10 +53,14 @@ RngAdvances::RngAdvances()
     : SKIPS(
         "<b>Number of Skips:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        3, 0, 60
+        3, 0, 1200000000
     )
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH,
+    })
 {
     PA_ADD_OPTION(SKIPS);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
@@ -63,11 +68,20 @@ void RngAdvances::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     RngAdvances_Descriptor::Stats& stats = env.current_stats<RngAdvances_Descriptor::Stats>();
 
     require_player(env.console, context, BUTTON_LCLICK);
-    for (size_t i = 0; i < SKIPS; i++){
-        pbf_press_button(context, BUTTON_RCLICK, 20ms, 25ms);
+    size_t advances = 0;
+
+    for (size_t i = 0; i < SKIPS; i++) {
+        pbf_press_button(context, BUTTON_RCLICK, 50ms, 50ms);
+        advances++;
+
+        if (advances >= 500) {
+            stats.advances += advances;
+            advances = 0;
+            env.update_stats();
+        }
     }
-    stats.advances+=SKIPS;
-    env.update_stats();
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 
