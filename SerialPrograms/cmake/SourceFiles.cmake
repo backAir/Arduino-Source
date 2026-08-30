@@ -2934,6 +2934,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_DailyHighlightRNG.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_DailyHighlightRNG.h
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_AnimationSequenceTracker.cpp
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_AnimationSequenceTracker.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_RngAdvances.cpp

@@ -41,7 +41,7 @@ RngAdvances_Descriptor::RngAdvances_Descriptor()
         "PokemonSwSh:RngAdvances",
         STRING_POKEMON + " SwSh", "Rng Advances",
         "Programs/PokemonSwSh/RngAdvances.html",
-        "Increase your height in place using the height glitch.",
+        "Advances a set amount of RNG steps in team menu.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
@@ -55,11 +55,23 @@ RngAdvances::RngAdvances()
         LockMode::LOCK_WHILE_RUNNING,
         3, 0, 1200000000
     )
+    , ADVANCE_PRESS_DURATION(
+        "<b>Advance Press Duration:</b><br>Hold the button down for this long to advance once.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "20 ms"
+    )
+    , ADVANCE_RELEASE_DURATION(
+        "<b>Advance Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "50 ms"
+    )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
     PA_ADD_OPTION(SKIPS);
+    PA_ADD_OPTION(ADVANCE_PRESS_DURATION);
+    PA_ADD_OPTION(ADVANCE_RELEASE_DURATION);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -70,16 +82,19 @@ void RngAdvances::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     require_player(env.console, context, BUTTON_LCLICK);
     size_t advances = 0;
 
+
     for (size_t i = 0; i < SKIPS; i++) {
-        pbf_press_button(context, BUTTON_RCLICK, 50ms, 50ms);
+        pbf_press_button(context, BUTTON_RCLICK, ADVANCE_PRESS_DURATION, ADVANCE_RELEASE_DURATION);
         advances++;
 
-        if (advances >= 500) {
+        if (advances >= 100) {
             stats.advances += advances;
             advances = 0;
             env.update_stats();
         }
     }
+    stats.advances += advances;
+    env.update_stats();
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

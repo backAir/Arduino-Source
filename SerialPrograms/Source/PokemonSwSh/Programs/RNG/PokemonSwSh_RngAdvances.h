@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_RngAdvances_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -33,6 +34,8 @@ public:
 
 private:
     SimpleIntegerOption<uint32_t> SKIPS;
+    MillisecondsOption ADVANCE_PRESS_DURATION;
+    MillisecondsOption ADVANCE_RELEASE_DURATION;
 
     EventNotificationsOption NOTIFICATIONS;
 };
