@@ -171,8 +171,8 @@ EggAutonomousKeep::EggAutonomousKeep()
     PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(NOTIFICATIONS);
 
+    PA_ADD_OPTION(DEBUG_PROCESSING_HATCHED);
     if (STATIC_GLOBALS.DEVELOPER_MODE){
-        PA_ADD_OPTION(DEBUG_PROCESSING_HATCHED);
         PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
     }
 }
@@ -784,6 +784,9 @@ bool EggAutonomousKeep::process_hatched_pokemon(
 
     menus_to_boxsystem(env.console, context);
 
+
+
+    int curr_col = 1;
     // Before processing the box:
     // Confirm that Box Column 0 has 5 eggs, and the party has no eggs
     context.wait_for_all_requests();
@@ -809,196 +812,48 @@ bool EggAutonomousKeep::process_hatched_pokemon(
     }
 
 
-    const Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
+    //const Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
-
+    // bair code here
     // select top Pokemon in party
     box_scroll(context, DPAD_LEFT);
     // select the first egg
     box_scroll(context, DPAD_DOWN);
 
     context.wait_for_all_requests();
-    {
-        // Define the scope of video overlay rendering for various checks:
-        VideoOverlaySet overlay_set(env.console.overlay());
-        BoxShinySymbolDetector shiny_symbol;
-        shiny_symbol.make_overlays(overlay_set);
-        BoxGenderDetector gender_detector;
-        gender_detector.make_overlays(overlay_set);
-        IvJudgeReaderScope iv_reader(env.console.overlay(), LANGUAGE);
-        BoxNatureDetector nature_detector(env.console.overlay());
 
-        for (size_t i_hatched = 0; i_hatched < 5; i_hatched++){
-            pbf_wait(context, 400ms); // wait for a while to make sure the pokemon stats are loaded.
-            context.wait_for_all_requests();
-            auto screen = env.console.video().snapshot();
+    pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 400ms);
 
-            bool shiny = shiny_symbol.detect(screen);
-            if (shiny){
-                env.log("Pokemon " + std::to_string(i_hatched) + " is shiny!", COLOR_BLUE);
-                env.console.overlay().add_log("Pokemon " + std::to_string(i_hatched+1) + "/5 is shiny!", COLOR_YELLOW);
-                stats.m_shinies++;
-                env.update_stats();
-                send_encounter_notification(
-                    env,
-                    m_notification_noop,
-                    NOTIFICATION_SHINY,
-                    false, true, {{{}, ShinyType::UNKNOWN_SHINY}}, std::nan(""),
-                    screen
-                );
-            }else{
-                env.log("Pokemon " + std::to_string(i_hatched) + " is not shiny.", COLOR_PURPLE);
-                env.console.overlay().add_log("Pokemon " + std::to_string(i_hatched+1) + "/5 not shiny", COLOR_WHITE);
-            }
-            // Note: we assume the pokemon storage UI is in the state of judging pokemon stats.
-            //   In this way we can detect pokemon stats.
-            
-            IvJudgeReader::Results IVs = iv_reader.read(env.console, screen);
-            StatsHuntGenderFilter gender = gender_detector.detect(screen);
-            env.log(IVs.to_string(), COLOR_GREEN);
-            env.log("Gender: " + gender_to_string(gender), COLOR_GREEN);
-            NatureReader::Results nature = nature_detector.read(env.console.logger(), screen);
+    for (int var = 0; var < 2; ++var) {
 
-            StatsHuntAction action = FILTERS0.get_action(shiny, gender, nature.nature, IVs);
-
-            auto send_keep_notification = [&](){
-                if (!shiny){
-                    send_encounter_notification(
-                        env,
-                        NOTIFICATION_NONSHINY_KEEP,
-                        NOTIFICATION_SHINY,
-                        false, false, {}, std::nan(""),
-                        screen
-                    );
-                }
-            };
-            switch (action){
-            case StatsHuntAction::StopProgram:
-                env.log("Program stop requested...");
-                env.console.overlay().add_log("Request program stop", COLOR_WHITE);
-                send_keep_notification();
-                return true;
-            case StatsHuntAction::Keep:
-                env.log("Moving Pokemon to keep box...", COLOR_BLUE);
-                m_num_pokemon_kept++;
-                env.console.overlay().add_log("Keep pokemon " + std::to_string(m_num_pokemon_kept) + "/" + std::to_string(MAX_KEEPERS), COLOR_YELLOW);
-                send_keep_notification();
-
-                // Press A twice to pick the pokemon
-                ssf_press_button_ptv(context, BUTTON_A, 480ms, EGG_BUTTON_HOLD_DELAY);
-                ssf_press_button_ptv(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
-
-                // Move it rightward, so that it stays on top of the box area
-                box_scroll(context, DPAD_RIGHT);
-                // Press Button L to change to the box on the left
-                ssf_press_button_ptv(context, BUTTON_L, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-
-                // Because we don't know which place in the box to place the pokemon, we will
-                // throw the pokemon in the all-box view. So it automatically sit in the first empty slot
-                // in the box:
-                
-                // Move it three times upward, so that it stays on top of the "Box List" button
-                box_scroll(context, DPAD_UP);
-                box_scroll(context, DPAD_UP);
-                box_scroll(context, DPAD_UP);
-                
-                // Press the button to go to box list view
-                ssf_press_button_ptv(context, BUTTON_A, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-                // Press button A to drop the pokemon into the box
-                ssf_press_button_ptv(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
-                // Press button B to go back to the last box
-                ssf_press_button_ptv(context, BUTTON_B, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-                // Press button R to change to the box on the right, the box with the next batch of eggs
-                ssf_press_button_ptv(context, BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-                // Move cursor left to point to the last slot in the party
-                box_scroll(context, DPAD_LEFT);
-                // Move cursor downward three times so that it goes to the original place (second slot in the party)
-                box_scroll(context, DPAD_DOWN);
-                box_scroll(context, DPAD_DOWN);
-                box_scroll(context, DPAD_DOWN);
-                
-                if (m_num_pokemon_kept >= MAX_KEEPERS){
-                    env.log("Max keepers reached. Stopping program...");
-                    env.console.overlay().add_log("Max Keepers reached.", COLOR_WHITE);
-                    return true;
-                }
-                break;
-            case StatsHuntAction::Discard:
-                env.log("Releasing Pokemon...", COLOR_PURPLE);
-                env.console.overlay().add_log("Release Pokemon", COLOR_WHITE);
-
-                // ssf_press_button2(context, BUTTON_A, 60, 10);
-                // ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-                // ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-                // ssf_press_button2(context, BUTTON_A, 125, 10);
-                // ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-                // pbf_mash_button(context, BUTTON_A, 180);
-
-                // Press A to open pokemon menu
-                pbf_press_button(context, BUTTON_A, 160ms, 400ms);
-                context.wait_for_all_requests();
-                StoragePokemonMenuArrowFinder pokemon_menu_detector(env.console.overlay());
-                int ret = wait_until(
-                    env.console, context, std::chrono::seconds(10),
-                    {{pokemon_menu_detector}}
-                );
-                if (ret != 0){
-                    OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "Cannot detect pokemon menu in storage box.",
-                        env.console
-                    );
-                }
-
-                const bool stop_on_detected = true;
-                BlackDialogBoxDetector dialog_detector(stop_on_detected);
-                VideoOverlaySet dialog_overlay_set(env.console);
-                dialog_detector.make_overlays(dialog_overlay_set);
-
-                // Move cursor upward two times to point to "Release" menu item
-                pbf_press_dpad(context, DPAD_UP, 160ms, 160ms);
-                pbf_press_dpad(context, DPAD_UP, 160ms, 160ms);
-
-                // Press A to release
-                pbf_press_button(context, BUTTON_A, 160ms, 840ms);
-                // Move cursor from "Not release" to "release".
-                pbf_press_dpad(context, DPAD_UP, 160ms, 240ms);
-                // Press A to confirm release, wait for a while to let the next dialog box pop up.
-                pbf_press_button(context, BUTTON_A, 160ms, 1600ms);
-
-                context.wait_for_all_requests();
-                ret = wait_until(
-                    env.console, context, std::chrono::seconds(10),
-                    {{dialog_detector}}
-                );
-                if (ret != 0){
-                    OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "Miss second dialog when releasing pokemon.",
-                        env.console
-                    );
-                }
-                pbf_press_button(context, BUTTON_A, 160ms, 800ms);
-                
-                size_t dialog_count = 0;
-                const size_t max_dialog_count = 6;
-                for (; dialog_count < max_dialog_count; dialog_count++){
-                    context.wait_for_all_requests();
-                    if (!dialog_detector.process_frame(env.console.video().snapshot(), current_time())){
-                        break;
-                    }
-                    pbf_press_button(context, BUTTON_A, 160ms, 800ms);
-                }
-                if (dialog_count == max_dialog_count){
-                    OperationFailedExceptionWithScreenshot::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "Unexpected dialogs when releasing pokemon.",
-                        env.console
-                    );
-                }
-                break;
-            }
+        pbf_press_button(context, BUTTON_A, 100ms, 400ms);
+        for (int j = 0; j < curr_col; ++j) {
+            pbf_press_button(context, BUTTON_RIGHT, 100ms, 400ms);
         }
+        pbf_press_button(context, BUTTON_UP, 100ms, 400ms);
+        pbf_press_button(context, BUTTON_A, 100ms, 400ms);
+        pbf_press_button(context, BUTTON_DOWN, 100ms, 400ms);
+
+        pbf_press_button(context, BUTTON_A, 100ms, 400ms);
+        pbf_press_button(context, BUTTON_DOWN, 100ms, 400ms);
+        for (int j = 0; j < curr_col; ++j) {
+            pbf_press_button(context, BUTTON_LEFT, 100ms, 400ms);
+        }
+        pbf_press_button(context, BUTTON_A, 100ms, 400ms);
+        pbf_press_button(context, BUTTON_DOWN, 100ms, 400ms);
+
+    }
+    pbf_press_button(context, BUTTON_A, 100ms, 400ms);
+    for (int j = 0; j < curr_col; ++j) {
+        pbf_press_button(context, BUTTON_RIGHT, 100ms, 400ms);
+    }
+    pbf_press_button(context, BUTTON_UP, 100ms, 400ms);
+    pbf_press_button(context, BUTTON_A, 100ms, 400ms);
+
+
+
+    if(1==1){
+        return true;
     }
 
     // Get eggs to party:
@@ -1050,7 +905,7 @@ bool EggAutonomousKeep::process_hatched_pokemon(
             ErrorReport::SEND_ERROR_REPORT,
             "process_hatched_pokemon: After processing, we expected a party full of 5 eggs.",
             env.console
-        );        
+        );
     }
 
     //  Back out to menu.
@@ -1157,6 +1012,18 @@ size_t EggAutonomousKeep::count_empty_slots_in_party(VideoStream& stream, const 
 }
 
 size_t EggAutonomousKeep::count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen){
+
+    size_t num_eggs = 0;
+    for (uint8_t row = 0; row < 5; row++){
+        BoxEggDetector egg(SlotLocation::BOX, row);
+        bool is_egg = egg.detect(screen);
+        if (is_egg) { num_eggs++; }
+    }
+
+    return num_eggs;
+}
+
+size_t EggAutonomousKeep::count_eggs_in_nth_box_column(VideoStream& stream, const ImageViewRGB32& screen, int column){
 
     size_t num_eggs = 0;
     for (uint8_t row = 0; row < 5; row++){
