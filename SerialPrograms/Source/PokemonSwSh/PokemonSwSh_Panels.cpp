@@ -47,6 +47,7 @@
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.h"
 
 #include "Programs/EggPrograms/PokemonSwSh_EggAutonomous.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggAutonomousKeep.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
@@ -69,6 +70,7 @@
 #include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
 #include "Programs/RNG/PokemonSwSh_DailyHighlightRNG.h"
 #include "Programs/RNG/PokemonSwSh_AnimationSequenceTracker.h"
+#include "Programs/RNG/PokemonSwSh_HomeDaySkipperEU.h"
 #include "Programs/RNG/PokemonSwSh_SeedFinder.h"
 #include "Programs/RNG/PokemonSwSh_RngAdvances.h"
 
@@ -148,6 +150,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<EggFetcherMultiple_Descriptor, EggFetcherMultiple>());
     ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
     ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
+    ret.emplace_back(make_single_switch_program<EggAutonomousKeep_Descriptor, EggAutonomousKeep>());
     ret.emplace_back(make_single_switch_program<GodEggItemDupe_Descriptor, GodEggItemDupe>());
     if (STATIC_GLOBALS.NAUGHTY_MODE || STATIC_GLOBALS.DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());
@@ -177,6 +180,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AnimationSequenceTracker_Descriptor, AnimationSequenceTracker>());
     ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
     ret.emplace_back(make_single_switch_program<RngAdvances_Descriptor, RngAdvances>());
+    ret.emplace_back(make_single_switch_program<HomeDaySkipperEU_Descriptor, HomeDaySkipperEU>());
 
     ret.emplace_back("---- Multi-Switch Programs ----");
     ret.emplace_back(make_multi_switch_program<SynchronizedSpinning_Descriptor, SynchronizedSpinning>());

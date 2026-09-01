@@ -2848,6 +2848,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomous.h
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomousKeep.cpp
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggAutonomousKeep.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombinedShared.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.h
@@ -2936,6 +2938,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_DailyHighlightRNG.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_AnimationSequenceTracker.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_AnimationSequenceTracker.h
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_HomeDaySkipperEU.cpp
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_HomeDaySkipperEU.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_RngAdvances.cpp

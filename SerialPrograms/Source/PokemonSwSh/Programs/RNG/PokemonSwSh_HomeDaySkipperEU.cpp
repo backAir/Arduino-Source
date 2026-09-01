@@ -1,0 +1,230 @@
+/*  Home Day Skipper (EU)
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "Controllers/ControllerTypes.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateSkippers.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperStats.h"
+#include "PokemonSwSh_HomeDaySkipperEU.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
+
+using namespace Pokemon;
+
+
+HomeDaySkipperEU_Descriptor::HomeDaySkipperEU_Descriptor()
+    : SingleSwitchProgramDescriptor(
+        "PokemonSwSh:HomeDaySkipperEU",
+        STRING_POKEMON + " SwSh", "Home Day Skipper (EU)",
+        "Programs/PokemonSwSh/HomeDaySkipperEU.html",
+        "A home-menu day skipper for EU date format. Does not enter the game.",
+        ProgramControllerClass::StandardController_WithRestrictions,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
+    )
+{}
+std::unique_ptr<StatsTracker> HomeDaySkipperEU_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new SkipperStats());
+}
+
+
+
+HomeDaySkipperEU::HomeDaySkipperEU()
+    : SKIPS(
+        "<b>Number of Frame Skips:</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        10
+    )
+    , REAL_LIFE_YEAR(
+        "<b>Real Life Year:</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        std::min(current_year(), (uint16_t)2060),
+        2000, 2060
+    )
+    , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRESS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_FATAL,
+    })
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
+    )
+    , CORRECTION_SKIPS(
+        "<b>Auto-Correct Interval:</b><br>Run auto-recovery every this # of skips. Zero disables the auto-corrections.",
+        LockMode::LOCK_WHILE_RUNNING,
+        1000
+    )
+{
+    PA_ADD_OPTION(START_LOCATION);
+    PA_ADD_OPTION(SKIPS);
+    PA_ADD_OPTION(REAL_LIFE_YEAR);
+    PA_ADD_OPTION(NOTIFICATIONS);
+    PA_ADD_STATIC(m_advanced_options);
+    PA_ADD_OPTION(CORRECTION_SKIPS);
+}
+
+
+
+void HomeDaySkipperEU::go_to_home_menu(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    if (START_LOCATION.start_in_grip_menu()){
+        grip_menu_connect_go_home(context);
+    }else{
+        ensure_at_home(env.console, context);
+    }
+}
+
+
+void HomeDaySkipperEU::run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    using namespace DateSkippers::Switch1;
+
+    bool needs_inference;
+    switch (context->performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired:
+        needs_inference = false;
+        break;
+    case ControllerPerformanceClass::SerialPABotBase_Wireless:
+        needs_inference = true;
+        break;
+    default:
+        throw UserSetupError(
+            env.logger(),
+            "This program requires a controller performance class of \"Wired\" or \"Wireless\" for the Switch 1."
+        );
+    }
+
+
+    SkipperStats& stats = env.current_stats<SkipperStats>();
+    stats.total_skips = SKIPS;
+    stats.runs++;
+
+    //  Setup globals.
+    uint8_t real_life_year = (uint8_t)(
+        REAL_LIFE_YEAR < 2000 ?  0 :
+        REAL_LIFE_YEAR > 2060 ? 60 : REAL_LIFE_YEAR - 2000
+    );
+    uint8_t year = 60;
+    uint32_t remaining_skips = SKIPS;
+
+    go_to_home_menu(env, context);
+
+    //  Connect
+    pbf_press_button(context, BUTTON_ZR, 40ms, 40ms);
+
+    //  Setup starting state.
+    init_view(context);
+    rollback_year_full(context, false);
+    year = 0;
+
+    uint16_t correct_count = 0;
+    while (remaining_skips > 0){
+        send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
+
+        if (needs_inference){
+            increment_day_with_feedback(env.console, context, false);
+        }else{
+            increment_day(context, false);
+        }
+
+
+        correct_count++;
+        year++;
+        remaining_skips--;
+        stats.issued++;
+        env.update_stats();
+
+        if (year >= 60){
+            if (real_life_year <= 36){
+                rollback_year_sync(context);
+                year = real_life_year;
+            }else{
+                rollback_year_full(context, false);
+                year = 0;
+            }
+        }
+        if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
+            correct_count = 0;
+            auto_recovery(context);
+        }
+    }
+
+    context.wait_for_all_requests();
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+}
+void HomeDaySkipperEU::run_switch2(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    using namespace DateSkippers::Switch2;
+
+    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired){
+        throw UserSetupError(
+            env.logger(),
+            "This program requires a controller performance class of \"Wired\" for the Switch 2."
+        );
+    }
+
+    SkipperStats& stats = env.current_stats<SkipperStats>();
+    stats.total_skips = SKIPS;
+    stats.runs++;
+
+    uint32_t remaining_skips = SKIPS;
+
+    go_to_home_menu(env, context);
+
+    //  Connect
+    pbf_press_button(context, BUTTON_ZR, 40ms, 40ms);
+
+    //  Setup starting state.
+    init_view(context);
+
+    uint8_t day = 1;
+    while (remaining_skips > 0){
+        send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
+
+        increment_day_eu(context);
+
+        if (day == 31){
+            day = 1;
+        }else{
+            day++;
+            remaining_skips--;
+            stats.issued++;
+            env.update_stats();
+        }
+    }
+
+    context.wait_for_all_requests();
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+}
+
+
+
+
+void HomeDaySkipperEU::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    ConsoleType console_type = env.console.state().console_type();
+    if (is_switch1(console_type)){
+        run_switch1(env, context);
+        return;
+    }
+    if (is_switch2(console_type)){
+        run_switch2(env, context);
+        return;
+    }
+    throw UserSetupError(
+        env.console,
+        "Please select a valid Switch console type."
+    );
+}
+
+
+}
+}
+}
