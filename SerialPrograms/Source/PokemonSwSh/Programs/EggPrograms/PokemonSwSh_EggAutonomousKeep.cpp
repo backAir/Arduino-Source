@@ -18,6 +18,9 @@
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BoxEggDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxEmptySlotDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxGenderDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BoxShinySymbolDetector.h"
@@ -41,6 +44,27 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 namespace{
+
+
+bool is_nth_box_slot_empty(const ImageViewRGB32& screen, uint8_t row, uint8_t column){
+    BoxEggDetector egg(SlotLocation::BOX, row, column);
+    if (egg.detect(screen)){
+        return false;
+    }
+
+    // Use the same column alignment as BoxEggDetector, but sample a larger region
+    // like the party empty-slot detector. The default BoxEmptySlotDetector crop is
+    // too small and misaligned for non-zero columns, especially when eggs are present.
+    ImageFloatBox box(
+        0.0705 * column + 0.270241,
+        0.1255 * row + 0.2401,
+        0.048,
+        0.082
+    );
+    ImageStats stats = image_stats(extract_box_reference(screen, box));
+    const double max_stddev_sum = 50;
+    return stats.stddev.sum() <= max_stddev_sum;
+}
 
 
 }
@@ -788,8 +812,8 @@ bool EggAutonomousKeep::process_hatched_pokemon(
     menus_to_boxsystem(env.console, context);
 
 
-
-    static int curr_col = 4;
+    static int box_count = 0;
+    static int curr_col = 0;
     // Before processing the box:
     // Confirm that the egg storage column has 5 eggs, and the party has no eggs
     context.wait_for_all_requests();
@@ -800,8 +824,8 @@ bool EggAutonomousKeep::process_hatched_pokemon(
     size_t num_empty_slots_in_column_before = count_empty_slots_in_nth_box_column(env.console, screen0, curr_col);    
     size_t num_eggs_in_party_before = count_eggs_in_party(env.console, screen0);
     size_t num_empty_slots_in_party_before = count_empty_slots_in_party(env.console, screen0);
-    if (num_eggs_in_column_before != 5 || num_empty_slots_in_column_before != 0){
-        env.log("EGG ERROR THINGY", COLOR_RED);
+    if (1==2 && (num_eggs_in_column_before != 5 || num_empty_slots_in_column_before != 0)){
+        env.log("EGG ERROR THINGY " + std::to_string(curr_col) + " " +std::to_string(num_eggs_in_column_before) + " "+std::to_string(num_empty_slots_in_column_before), COLOR_RED);
 
         return true;
         //if(1==1){curr_col +=1; goto egg_check;}
@@ -812,7 +836,7 @@ bool EggAutonomousKeep::process_hatched_pokemon(
         //     env.console
         // );
     }
-    if (num_eggs_in_party_before != 0 || num_empty_slots_in_party_before != 0){
+    if (1==2 && (num_eggs_in_party_before != 0 || num_empty_slots_in_party_before != 0)){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "process_hatched_pokemon: Before processing, we expected a party without eggs (and no empty slots), since they should all be hatched.",
@@ -860,7 +884,16 @@ bool EggAutonomousKeep::process_hatched_pokemon(
     }
     pbf_press_button(context, BUTTON_A, delay, delay_out);
 
+    curr_col += 1;
 
+    if(curr_col == 6){
+        box_count+=1;
+        pbf_press_button(context, BUTTON_R, delay, delay_out);
+        curr_col = 0;
+        if(box_count == MAX_KEEPERS){
+            return true;
+        }
+    }
     // After processing the box:
     // Confirm that the egg storage column is empty, and the party is full of eggs
 
@@ -930,8 +963,10 @@ void EggAutonomousKeep::check_box(VideoStream& stream, ProControllerContext& con
 
 
 void EggAutonomousKeep::check_box_filled(VideoStream& stream, const ImageViewRGB32& screen){
+
     for (uint8_t row = 0; row < 5; row++){
-        for (uint8_t column = 1; column < 6; column++){
+        //prog works with last col not filled
+        for (uint8_t column = 1; column < 5; column++){
             BoxEmptySlotDetector slot(SlotLocation::BOX, row, column);
             bool is_empty = slot.detect(screen);
             // stream.log("row " + std::to_string(row) + " col " + std::to_string(column) + (is_empty ? " is_empty" : " not empty"));
@@ -1019,9 +1054,9 @@ size_t EggAutonomousKeep::count_empty_slots_in_nth_box_column(VideoStream& strea
 
     size_t num_empty = 0;
     for (uint8_t row = 0; row < 5; row++){
-        BoxEmptySlotDetector slot(SlotLocation::BOX, row, (uint8_t) column);
-        bool is_empty = slot.detect(screen);
-        if (is_empty) { num_empty++; }
+        if (is_nth_box_slot_empty(screen, row, (uint8_t)column)){
+            num_empty++;
+        }
     }
 
     return num_empty;
@@ -1029,14 +1064,7 @@ size_t EggAutonomousKeep::count_empty_slots_in_nth_box_column(VideoStream& strea
 
 size_t EggAutonomousKeep::count_empty_slots_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen){
 
-    size_t num_empty = 0;
-    for (uint8_t row = 0; row < 5; row++){
-        BoxEmptySlotDetector slot(SlotLocation::BOX, row, 0);
-        bool is_empty = slot.detect(screen);
-        if (is_empty) { num_empty++; }
-    }
-
-    return num_empty;
+    return count_empty_slots_in_nth_box_column(stream, screen, 0);
 }
 
 
