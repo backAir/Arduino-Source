@@ -31,7 +31,7 @@ const ImageMatch::ExactImageMatcher& EGG_MATCHER(){
     return matcher;
 }
 
-BoxEggDetector::BoxEggDetector(SlotLocation side, uint8_t row, double min_euclidean_distance, Color color)
+BoxEggDetector::BoxEggDetector(SlotLocation side, uint8_t row, uint8_t column, double min_euclidean_distance, Color color)
 : m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance)
 , m_color(color){
     if (side == SlotLocation::PARTY){
@@ -40,10 +40,10 @@ BoxEggDetector::BoxEggDetector(SlotLocation side, uint8_t row, double min_euclid
         }
         m_box = ImageFloatBox(0.045414, 0.1255 * row + 0.2401, 0.023882, 0.043856);
     }else if (side == SlotLocation::BOX){
-        if (row > 4){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID box row for BoxEggDetector");
+        if (row > 4 || column > 5){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID box row/column for BoxEggDetector");
         }
-        m_box = ImageFloatBox(0.270241, 0.1255 * row + 0.2401, 0.023882, 0.049);
+        m_box = ImageFloatBox(0.0705 * column + 0.270241, 0.1255 * row + 0.2401, 0.023882, 0.049);
     }else{
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "INVALID SlotLocation for BoxEggDetector");
     }

@@ -24,7 +24,7 @@ enum class SlotLocation{
 
 class BoxEggDetector : public StaticScreenDetector{
 public:
-    BoxEggDetector(SlotLocation side, uint8_t row, double min_euclidean_distance = 100, Color color = COLOR_BLUE);
+    BoxEggDetector(SlotLocation side, uint8_t row, uint8_t column = 0, double min_euclidean_distance = 100, Color color = COLOR_BLUE);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;

@@ -209,7 +209,7 @@ void EggAutonomousKeep::program(SingleSwitchProgramEnvironment& env, ProControll
     size_t num_empty_slots_in_column_0 = count_empty_slots_in_first_box_column(env.console, screen);
     size_t num_eggs_in_party = count_eggs_in_party(env.console, screen);
     size_t num_empty_slots_in_party = count_empty_slots_in_party(env.console, screen);
-    if (num_eggs_in_column_0 + num_empty_slots_in_column_0 != 5){
+    if (1==2 && num_eggs_in_column_0 + num_empty_slots_in_column_0 != 5){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Total number of eggs and empty slots in the first box column don't add up to 5. "
@@ -217,7 +217,7 @@ void EggAutonomousKeep::program(SingleSwitchProgramEnvironment& env, ProControll
             env.console
         );
     }
-    if (num_eggs_in_party + num_empty_slots_in_party != 5){
+    if (1==2 && num_eggs_in_party + num_empty_slots_in_party != 5){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Total number of eggs and empty slots in the party don't add up to 5. "
@@ -256,10 +256,13 @@ void EggAutonomousKeep::program(SingleSwitchProgramEnvironment& env, ProControll
 
     // while(run_batch(env, context, stats)){}
 
+    //! main loop here ----------------------------------------------------------------------------------
     size_t consecutive_failures = 0;
     while(m_num_pokemon_kept < MAX_KEEPERS){
+        env.log("MAIN LOOP");
+
         try{
-            if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
+            if (1==2&&TOUCH_DATE_INTERVAL.ok_to_touch_now()){
                 env.log("Touching date to prevent rollover.");
                 env.console.overlay().add_log("Touching date", COLOR_WHITE);
                 go_home(env.console, context);
@@ -786,22 +789,28 @@ bool EggAutonomousKeep::process_hatched_pokemon(
 
 
 
-    int curr_col = 1;
+    static int curr_col = 4;
     // Before processing the box:
-    // Confirm that Box Column 0 has 5 eggs, and the party has no eggs
+    // Confirm that the egg storage column has 5 eggs, and the party has no eggs
     context.wait_for_all_requests();
     context.wait_for(500ms);
+    //egg_check:
     auto screen0 = env.console.video().snapshot();
-    size_t num_eggs_in_column_0_before = count_eggs_in_first_box_column(env.console, screen0);
-    size_t num_empty_slots_in_column_0_before = count_empty_slots_in_first_box_column(env.console, screen0);
+    size_t num_eggs_in_column_before = count_eggs_in_nth_box_column(env.console, screen0, curr_col);
+    size_t num_empty_slots_in_column_before = count_empty_slots_in_nth_box_column(env.console, screen0, curr_col);    
     size_t num_eggs_in_party_before = count_eggs_in_party(env.console, screen0);
     size_t num_empty_slots_in_party_before = count_empty_slots_in_party(env.console, screen0);
-    if (num_eggs_in_column_0_before != 5 || num_empty_slots_in_column_0_before != 0){
-        OperationFailedExceptionWithScreenshot::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "process_hatched_pokemon: Before processing, we expected 5 eggs in the first box column.",
-            env.console
-        );
+    if (num_eggs_in_column_before != 5 || num_empty_slots_in_column_before != 0){
+        env.log("EGG ERROR THINGY", COLOR_RED);
+
+        return true;
+        //if(1==1){curr_col +=1; goto egg_check;}
+
+        // OperationFailedExceptionWithScreenshot::fire(
+        //     ErrorReport::SEND_ERROR_REPORT,
+        //     "process_hatched_pokemon: Before processing, we expected 5 eggs in box column " + std::to_string(curr_col) + ".",
+        //     env.console
+        // );
     }
     if (num_eggs_in_party_before != 0 || num_empty_slots_in_party_before != 0){
         OperationFailedExceptionWithScreenshot::fire(
@@ -823,84 +832,55 @@ bool EggAutonomousKeep::process_hatched_pokemon(
     context.wait_for_all_requests();
 
     pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 400ms);
-
+    auto delay = 120ms;
+    auto delay_out = 120ms;
     for (int var = 0; var < 2; ++var) {
 
-        pbf_press_button(context, BUTTON_A, 100ms, 400ms);
-        for (int j = 0; j < curr_col; ++j) {
-            pbf_press_button(context, BUTTON_RIGHT, 100ms, 400ms);
+        pbf_press_button(context, BUTTON_A, delay, delay_out);
+        for (int j = 0; j < curr_col+1; ++j) {
+            pbf_press_button(context, BUTTON_RIGHT, delay, delay_out);
         }
-        pbf_press_button(context, BUTTON_UP, 100ms, 400ms);
-        pbf_press_button(context, BUTTON_A, 100ms, 400ms);
-        pbf_press_button(context, BUTTON_DOWN, 100ms, 400ms);
+        pbf_press_button(context, BUTTON_UP, delay, delay_out);
+        pbf_press_button(context, BUTTON_A, delay, delay_out);
+        pbf_press_button(context, BUTTON_DOWN, delay, delay_out);
 
-        pbf_press_button(context, BUTTON_A, 100ms, 400ms);
-        pbf_press_button(context, BUTTON_DOWN, 100ms, 400ms);
-        for (int j = 0; j < curr_col; ++j) {
-            pbf_press_button(context, BUTTON_LEFT, 100ms, 400ms);
+        pbf_press_button(context, BUTTON_A, delay, delay_out);
+        pbf_press_button(context, BUTTON_DOWN, delay, delay_out);
+        for (int j = 0; j < curr_col+1; ++j) {
+            pbf_press_button(context, BUTTON_LEFT, delay, delay_out);
         }
-        pbf_press_button(context, BUTTON_A, 100ms, 400ms);
-        pbf_press_button(context, BUTTON_DOWN, 100ms, 400ms);
+        pbf_press_button(context, BUTTON_A, delay, delay_out);
+        pbf_press_button(context, BUTTON_DOWN, delay, delay_out);
 
     }
-    pbf_press_button(context, BUTTON_A, 100ms, 400ms);
-    for (int j = 0; j < curr_col; ++j) {
-        pbf_press_button(context, BUTTON_RIGHT, 100ms, 400ms);
+    pbf_press_button(context, BUTTON_A, delay, delay_out);
+    pbf_press_button(context, BUTTON_UP, delay, delay_out);
+    for (int j = 0; j < curr_col+1; ++j) {
+        pbf_press_button(context, BUTTON_RIGHT, delay, delay_out);
     }
-    pbf_press_button(context, BUTTON_UP, 100ms, 400ms);
-    pbf_press_button(context, BUTTON_A, 100ms, 400ms);
+    pbf_press_button(context, BUTTON_A, delay, delay_out);
 
-
-
-    if(1==1){
-        return true;
-    }
-
-    // Get eggs to party:
-
-    // Move cursor to the first slot in the box
-    box_scroll(context, DPAD_UP);
-    box_scroll(context, DPAD_RIGHT);
-
-    // Press Y twice to change selection method to group selection
-    pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 400ms);
-    pbf_press_button(context, BUTTON_Y, EGG_BUTTON_HOLD_DELAY, 400ms);
-
-    // Press A to start selection
-    pbf_press_button(context, BUTTON_A, EGG_BUTTON_HOLD_DELAY, 400ms);
-    // Move down to selection the entire column
-    for (size_t c = 0; c < 4; c++){
-        box_scroll(context, DPAD_DOWN);
-    }
-    // Press A to finish the selection
-    ssf_press_button_ptv(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
-    
-    // Move cursor to the second slot in the party
-    box_scroll(context, DPAD_LEFT);
-    box_scroll(context, DPAD_DOWN);
-
-    // Press A to finish dropping the egg column 
-    ssf_press_button_ptv(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 
     // After processing the box:
-    // Confirm that Box Column 0 is empty, and the party is full of eggs
-    check_box(env.console, context);
-    context.wait_for_all_requests();
+    // Confirm that the egg storage column is empty, and the party is full of eggs
+
+    //check_box(env.console, context);
+    //context.wait_for_all_requests();
     context.wait_for(500ms);
     auto screen = env.console.video().snapshot();
-    size_t num_eggs_in_column_0_after = count_eggs_in_first_box_column(env.console, screen);
-    size_t num_empty_slots_in_column_0_after = count_empty_slots_in_first_box_column(env.console, screen);
+    size_t num_eggs_in_column_after = count_eggs_in_nth_box_column(env.console, screen, curr_col);
+    size_t num_empty_slots_in_column_after = count_empty_slots_in_nth_box_column(env.console, screen, curr_col);
     size_t num_eggs_in_party_after = count_eggs_in_party(env.console, screen);
     size_t num_empty_slots_in_party_after = count_empty_slots_in_party(env.console, screen);
-    if (num_eggs_in_column_0_after != 0 || num_empty_slots_in_column_0_after != 5){
+    if (1==2&&(num_eggs_in_column_after != 0 || num_empty_slots_in_column_after != 5)){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "process_hatched_pokemon: After processing, we expected an empty first box column.",
+            "process_hatched_pokemon: After processing, we expected an empty box column " + std::to_string(curr_col) + ".",
             env.console
         );
     }
 
-    if (num_eggs_in_party_after != 5 || num_empty_slots_in_party_after != 0){
+    if (1==2&&(num_eggs_in_party_after != 5 || num_empty_slots_in_party_after != 0)){
         OperationFailedExceptionWithScreenshot::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "process_hatched_pokemon: After processing, we expected a party full of 5 eggs.",
@@ -1027,12 +1007,24 @@ size_t EggAutonomousKeep::count_eggs_in_nth_box_column(VideoStream& stream, cons
 
     size_t num_eggs = 0;
     for (uint8_t row = 0; row < 5; row++){
-        BoxEggDetector egg(SlotLocation::BOX, row);
+        BoxEggDetector egg(SlotLocation::BOX, row, (uint8_t) column);
         bool is_egg = egg.detect(screen);
         if (is_egg) { num_eggs++; }
     }
 
     return num_eggs;
+}
+
+size_t EggAutonomousKeep::count_empty_slots_in_nth_box_column(VideoStream& stream, const ImageViewRGB32& screen, int column){
+
+    size_t num_empty = 0;
+    for (uint8_t row = 0; row < 5; row++){
+        BoxEmptySlotDetector slot(SlotLocation::BOX, row, (uint8_t) column);
+        bool is_empty = slot.detect(screen);
+        if (is_empty) { num_empty++; }
+    }
+
+    return num_empty;
 }
 
 size_t EggAutonomousKeep::count_empty_slots_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen){

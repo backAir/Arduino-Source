@@ -124,9 +124,8 @@ private:
 
     size_t count_eggs_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen);
     size_t count_eggs_in_nth_box_column(VideoStream& stream, const ImageViewRGB32& screen, int column);
-
-
     size_t count_empty_slots_in_first_box_column(VideoStream& stream, const ImageViewRGB32& screen);
+    size_t count_empty_slots_in_nth_box_column(VideoStream& stream, const ImageViewRGB32& screen, int column);
 
 
 
