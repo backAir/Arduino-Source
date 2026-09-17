@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -33,6 +34,7 @@ private:
     StartInGripOrGameOption START_LOCATION;
 
     SimpleIntegerOption<uint32_t> ANIMATION_COUNT;
+    StringOption SEQUENCE;
 
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption SAVE_SCREENSHOTS;

@@ -181,6 +181,43 @@ void increment_day(ProControllerContext& context, bool date_us){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 16ms, 48ms, 24ms);
     ssf_press_button(context, BUTTON_A, 96ms);
 }
+
+void decrement_day(ProControllerContext& context, bool date_us){
+    //  60 cycles (robust 2)
+
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("DateSkippers::Switch1::decrement_day()");
+    }
+
+    //  Press A twice. If the 1st one gets dropped due to the exit
+    //  animation taking too long, the 2nd press will recover to
+    //  avoid the trapping error at the cost of losing the skip.
+    ssf_press_button(context, BUTTON_A, 120ms);
+    ssf_press_button(context, BUTTON_A, 40ms);
+
+    if (date_us){
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+    }
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN,    0ms, 48ms, 24ms);
+
+    ssf_press_button(context, BUTTON_A, 16ms, 40ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT,  0ms, 48ms, 24ms);
+
+    //  Press A twice here to make sure we exit the window. If the 1st one is
+    //  dropped, we'll be slow to exit, but the 2nd A press of the next
+    //  iteration will correct this as there will be more than 20 ticks.
+    ssf_press_button(context, BUTTON_A, 24ms, 40ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);  //  Extra right presses to make sure we land on OK.
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 16ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 96ms);
+}
+
 void rollback_year_full(ProControllerContext& context, bool date_us){
     ThrottleScope scope(context->logging_throttler());
     if (scope){

@@ -1,4 +1,4 @@
-/*  Home Day Skipper (EU)
+/*  Day Skipper (RNG EU)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -8,11 +8,11 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateSkippers.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperStats.h"
-#include "PokemonSwSh_HomeDaySkipperEU.h"
+#include "PokemonSwSh_RngDaySkipperEU.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -21,24 +21,24 @@ namespace PokemonSwSh{
 using namespace Pokemon;
 
 
-HomeDaySkipperEU_Descriptor::HomeDaySkipperEU_Descriptor()
+RngDaySkipperEU_Descriptor::RngDaySkipperEU_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonSwSh:HomeDaySkipperEU",
-        STRING_POKEMON + " SwSh", "Home Day Skipper (EU)",
-        "Programs/PokemonSwSh/HomeDaySkipperEU.html",
-        "A home-menu day skipper for EU date format. Does not enter the game.",
+        "PokemonSwSh:RngDaySkipperEU",
+        STRING_POKEMON + " SwSh", "Day Skipper (RNG EU)",
+        "Programs/PokemonSwSh/DaySkipperEU.html",
+        "A day skipper for EU date format that.  (Switch 1: ~7500 skips/hour, Switch 2: 5655 skips/hour)",
         ProgramControllerClass::StandardController_WithRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
-std::unique_ptr<StatsTracker> HomeDaySkipperEU_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> RngDaySkipperEU_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new SkipperStats());
 }
 
 
 
-HomeDaySkipperEU::HomeDaySkipperEU()
+RngDaySkipperEU::RngDaySkipperEU()
     : SKIPS(
         "<b>Number of Frame Skips:</b>",
         LockMode::LOCK_WHILE_RUNNING,
@@ -66,7 +66,6 @@ HomeDaySkipperEU::HomeDaySkipperEU()
         1000
     )
 {
-    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(REAL_LIFE_YEAR);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -76,16 +75,7 @@ HomeDaySkipperEU::HomeDaySkipperEU()
 
 
 
-void HomeDaySkipperEU::go_to_home_menu(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    if (START_LOCATION.start_in_grip_menu()){
-        grip_menu_connect_go_home(context);
-    }else{
-        ensure_at_home(env.console, context);
-    }
-}
-
-
-void HomeDaySkipperEU::run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void RngDaySkipperEU::run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     using namespace DateSkippers::Switch1;
 
     bool needs_inference;
@@ -116,34 +106,49 @@ void HomeDaySkipperEU::run_switch1(SingleSwitchProgramEnvironment& env, ProContr
     uint8_t year = 60;
     uint32_t remaining_skips = SKIPS;
 
-    go_to_home_menu(env, context);
-
     //  Connect
     pbf_press_button(context, BUTTON_ZR, 40ms, 40ms);
 
     //  Setup starting state.
-    init_view(context);
-    rollback_year_full(context, false);
+    if(1==2){
+        init_view(context);
+        rollback_year_full(context, false);
+    }
+
     year = 0;
 
     uint16_t correct_count = 0;
+    bool up = true;
     while (remaining_skips > 0){
         send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
 
-        if (needs_inference){
-            increment_day_with_feedback(env.console, context, false);
+        if (up){
+            if (needs_inference){
+                increment_day_with_feedback(env.console, context, false);
+            }else{
+                increment_day(context, false);
+            }
         }else{
-            increment_day(context, false);
+            if (needs_inference){
+                throw UserSetupError(
+                    env.logger(),
+                    "This program requires a controller performance class of \"Wired\" or \"Wireless\" for the Switch 1."
+                    );
+            }else{
+                decrement_day(context, false);
+            }
         }
+        up = !up;
 
 
         correct_count++;
         year++;
         remaining_skips--;
         stats.issued++;
+//        env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
         env.update_stats();
 
-        if (year >= 60){
+        if (year >= 60 && 1==2){
             if (real_life_year <= 36){
                 rollback_year_sync(context);
                 year = real_life_year;
@@ -152,16 +157,27 @@ void HomeDaySkipperEU::run_switch1(SingleSwitchProgramEnvironment& env, ProContr
                 year = 0;
             }
         }
-        if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
+        if (1==3 && CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
             auto_recovery(context);
         }
     }
+    if(1==1){
+        context.wait_for_all_requests();
+        send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+        return;
+    }
 
+    //  Prevent the Switch from sleeping and the time from advancing.
     context.wait_for_all_requests();
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+
+    pbf_wait(context, 15000ms);
+    while (true){
+        ssf_press_button(context, BUTTON_A, 15000ms);
+    }
 }
-void HomeDaySkipperEU::run_switch2(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void RngDaySkipperEU::run_switch2(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     using namespace DateSkippers::Switch2;
 
     if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired){
@@ -176,8 +192,6 @@ void HomeDaySkipperEU::run_switch2(SingleSwitchProgramEnvironment& env, ProContr
     stats.runs++;
 
     uint32_t remaining_skips = SKIPS;
-
-    go_to_home_menu(env, context);
 
     //  Connect
     pbf_press_button(context, BUTTON_ZR, 40ms, 40ms);
@@ -201,14 +215,23 @@ void HomeDaySkipperEU::run_switch2(SingleSwitchProgramEnvironment& env, ProContr
         }
     }
 
+    //  Prevent the Switch from sleeping and the time from advancing.
     context.wait_for_all_requests();
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+
+    while (true){
+        ssf_press_button(context, BUTTON_A, 760ms);
+        for (int c = 0; c < 10; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+        }
+        ssf_press_button(context, BUTTON_A, 14000ms, 80ms);
+    }
 }
 
 
 
 
-void HomeDaySkipperEU::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void RngDaySkipperEU::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ConsoleType console_type = env.console.state().console_type();
     if (is_switch1(console_type)){
         run_switch1(env, context);

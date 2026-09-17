@@ -2938,8 +2938,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_DailyHighlightRNG.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_AnimationSequenceTracker.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_AnimationSequenceTracker.h
-    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_HomeDaySkipperEU.cpp
-    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_HomeDaySkipperEU.h
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_RngDaySkipperEU.cpp
+    Source/PokemonSwSh/Programs/RNG/PokemonSwSh_RngDaySkipperEU.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_RngAdvances.cpp

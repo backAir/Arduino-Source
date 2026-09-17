@@ -38,6 +38,13 @@ AnimationSequenceTracker::AnimationSequenceTracker()
         LockMode::LOCK_WHILE_RUNNING,
         128, 1, 10000
     )
+    , SEQUENCE(
+        false,
+        "<b>Animation Sequence:</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        "",
+        ""
+    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -54,6 +61,7 @@ AnimationSequenceTracker::AnimationSequenceTracker()
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(ANIMATION_COUNT);
+    PA_ADD_OPTION(SEQUENCE);
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(SAVE_SCREENSHOTS);
@@ -104,7 +112,7 @@ void AnimationSequenceTracker::program(SingleSwitchProgramEnvironment& env, ProC
         pbf_wait(context, 1440ms);
     }
 
-    env.console.log("Animation sequence: " + sequence);
+    SEQUENCE.set(sequence);
 }
 
 

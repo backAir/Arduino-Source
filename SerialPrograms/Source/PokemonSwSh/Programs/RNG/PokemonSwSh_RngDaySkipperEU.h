@@ -1,16 +1,15 @@
-/*  Home Day Skipper (EU)
+/*  Day Skipper (RNG EU)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_HomeDaySkipperEU_H
-#define PokemonAutomation_PokemonSwSh_HomeDaySkipperEU_H
+#ifndef PokemonAutomation_PokemonSwSh_RngDaySkipperEU_H
+#define PokemonAutomation_PokemonSwSh_RngDaySkipperEU_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -18,28 +17,25 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class HomeDaySkipperEU_Descriptor : public SingleSwitchProgramDescriptor{
+class RngDaySkipperEU_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    HomeDaySkipperEU_Descriptor();
+    RngDaySkipperEU_Descriptor();
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
 
-class HomeDaySkipperEU : public SingleSwitchProgramInstance{
+class RngDaySkipperEU : public SingleSwitchProgramInstance{
 public:
-    HomeDaySkipperEU();
+    RngDaySkipperEU();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void go_to_home_menu(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void run_switch2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
-    StartInGripOrGameOption START_LOCATION;
-
     SimpleIntegerOption<uint32_t> SKIPS;
     SimpleIntegerOption<uint16_t> REAL_LIFE_YEAR;
 
@@ -56,5 +52,3 @@ private:
 }
 }
 #endif
-
-

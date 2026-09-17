@@ -70,7 +70,7 @@
 #include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
 #include "Programs/RNG/PokemonSwSh_DailyHighlightRNG.h"
 #include "Programs/RNG/PokemonSwSh_AnimationSequenceTracker.h"
-#include "Programs/RNG/PokemonSwSh_HomeDaySkipperEU.h"
+#include "Programs/RNG/PokemonSwSh_RngDaySkipperEU.h"
 #include "Programs/RNG/PokemonSwSh_SeedFinder.h"
 #include "Programs/RNG/PokemonSwSh_RngAdvances.h"
 
@@ -176,11 +176,12 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousOverworld_Descriptor, ShinyHuntAutonomousOverworld>());
 
     ret.emplace_back("---- RNG ----");
-    ret.emplace_back(make_single_switch_program<SeedFinder_Descriptor, SeedFinder>());
-    ret.emplace_back(make_single_switch_program<AnimationSequenceTracker_Descriptor, AnimationSequenceTracker>());
-    ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
+	ret.emplace_back(make_single_switch_program<AnimationSequenceTracker_Descriptor, AnimationSequenceTracker>());
     ret.emplace_back(make_single_switch_program<RngAdvances_Descriptor, RngAdvances>());
-    ret.emplace_back(make_single_switch_program<HomeDaySkipperEU_Descriptor, HomeDaySkipperEU>());
+    ret.emplace_back(make_single_switch_program<RngDaySkipperEU_Descriptor, RngDaySkipperEU>());
+    ret.emplace_back(make_single_switch_program<SeedFinder_Descriptor, SeedFinder>());
+	ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
+
 
     ret.emplace_back("---- Multi-Switch Programs ----");
     ret.emplace_back(make_multi_switch_program<SynchronizedSpinning_Descriptor, SynchronizedSpinning>());
