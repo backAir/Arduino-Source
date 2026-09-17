@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -32,10 +33,13 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+    void go_home_to_date_time(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void run_switch2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
+    StartInGripOrGameOption START_LOCATION;
+
     SimpleIntegerOption<uint32_t> SKIPS;
     SimpleIntegerOption<uint16_t> REAL_LIFE_YEAR;
 

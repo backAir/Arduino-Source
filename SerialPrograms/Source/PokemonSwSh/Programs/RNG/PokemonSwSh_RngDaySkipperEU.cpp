@@ -10,7 +10,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateSkippers.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperStats.h"
 #include "PokemonSwSh_RngDaySkipperEU.h"
 
@@ -66,6 +69,7 @@ RngDaySkipperEU::RngDaySkipperEU()
         1000
     )
 {
+    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(REAL_LIFE_YEAR);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -74,6 +78,17 @@ RngDaySkipperEU::RngDaySkipperEU()
 }
 
 
+
+void RngDaySkipperEU::go_home_to_date_time(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    if (START_LOCATION.start_in_grip_menu()){
+        grip_menu_connect_go_home(context);
+    }else{
+        //  Connect the controller.
+        require_player(env.console, context, BUTTON_B);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
+    }
+    home_to_date_time(env.console, context, true);
+}
 
 void RngDaySkipperEU::run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     using namespace DateSkippers::Switch1;
@@ -105,9 +120,10 @@ void RngDaySkipperEU::run_switch1(SingleSwitchProgramEnvironment& env, ProContro
     );
     uint8_t year = 60;
     uint32_t remaining_skips = SKIPS;
+    ssf_press_button(context, BUTTON_B, 1500ms);
+    ssf_press_button(context, BUTTON_B, 1500ms);
 
-    //  Connect
-    pbf_press_button(context, BUTTON_ZR, 40ms, 40ms);
+    go_home_to_date_time(env, context);
 
     //  Setup starting state.
     if(1==2){
@@ -163,6 +179,10 @@ void RngDaySkipperEU::run_switch1(SingleSwitchProgramEnvironment& env, ProContro
         }
     }
     if(1==1){
+        ssf_press_button(context, BUTTON_HOME, 700ms);
+        ssf_press_button(context, BUTTON_HOME, 600ms);
+        ssf_press_button(context, BUTTON_X, 1500ms);
+        ssf_press_button(context, BUTTON_A, 1500ms);
         context.wait_for_all_requests();
         send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
         return;
@@ -193,11 +213,7 @@ void RngDaySkipperEU::run_switch2(SingleSwitchProgramEnvironment& env, ProContro
 
     uint32_t remaining_skips = SKIPS;
 
-    //  Connect
-    pbf_press_button(context, BUTTON_ZR, 40ms, 40ms);
-
-    //  Setup starting state.
-    init_view(context);
+    go_home_to_date_time(env, context);
 
     uint8_t day = 1;
     while (remaining_skips > 0){
